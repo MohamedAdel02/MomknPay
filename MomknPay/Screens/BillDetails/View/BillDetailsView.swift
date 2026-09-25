@@ -41,7 +41,7 @@ struct BillDetailsView: View {
                 .font(.system(size: 15, weight: .semibold))
             Spacer()
             Text(viewModel.formattedCountdown)
-                .font(.system(size: 17, weight: .medium))
+                .font(.plexMono(17, weight: .medium))
         }
         .foregroundStyle(Color.appPrimary)
         .padding(.horizontal, 16)
@@ -63,7 +63,7 @@ struct BillDetailsView: View {
                         .font(.system(size: 20, weight: .bold))
                         .foregroundStyle(Color.ink)
                     Text("1024750891")
-                        .font(.system(size: 16))
+                        .font(.plexMono(16))
                         .foregroundStyle(Color.inkMuted)
                 }
                 Spacer()
@@ -88,7 +88,7 @@ struct BillDetailsView: View {
                         .foregroundStyle(Color.ink)
                     Spacer()
                     Text("234.54")
-                        .font(.system(size: 36, weight: .medium))
+                        .font(.plexMono(36, weight: .medium))
                         .foregroundStyle(Color.ink)
                     Text("EGP")
                         .font(.system(size: 16, weight: .medium))
@@ -108,7 +108,7 @@ struct BillDetailsView: View {
                 .foregroundStyle(Color.inkMuted)
             Spacer()
             Text(value)
-                .font(bold ? .system(size: 17, weight: .bold) : .system(size: 20, weight: .medium))
+                .font(bold ? .system(size: 17, weight: .bold) : .plexMono(20, weight: .medium))
                 .foregroundStyle(Color.ink)
         }
     }
