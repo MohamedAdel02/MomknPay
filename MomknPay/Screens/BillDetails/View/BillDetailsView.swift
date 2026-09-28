@@ -73,21 +73,21 @@ struct BillDetailsView: View {
             Divider().overlay(Color.inkMuted)
 
             VStack(spacing: 16) {
-                row("Customer", "Mohamed Adel", bold: true)
-                row("Bill month", "August 2026", bold: true)
+                DetailRow("Customer", value: "Mohamed Adel", font: .system(size: 17, weight: .bold))
+                DetailRow("Bill month", value: "August 2026", font: .system(size: 17, weight: .bold))
                 Divider().overlay(Color.inkMuted)
-                
-                row("Amount due", "247.50")
-                row("Service fee", "5.00")
-                row("VAT (14% of fee)", "0.70")
+
+                DetailRow("Amount due", value: "247.50")
+                DetailRow("Service fee", value: "5.00")
+                DetailRow("VAT (14% of fee)", value: "0.70")
                 Divider().overlay(Color.inkMuted)
-                
+
                 HStack(alignment: .lastTextBaseline) {
                     Text("Total")
                         .font(.system(size: 18, weight: .bold))
                         .foregroundStyle(Color.ink)
                     Spacer()
-                    Text("234.54")
+                    Text("253.20")
                         .font(.plexMono(36, weight: .medium))
                         .foregroundStyle(Color.ink)
                     Text("EGP")
@@ -99,18 +99,6 @@ struct BillDetailsView: View {
         }
         .background(Color.white, in: RoundedRectangle(cornerRadius: 24))
         .overlay(RoundedRectangle(cornerRadius: 24).stroke(Color.inkMuted))
-    }
-
-    private func row(_ title: String, _ value: String, bold: Bool = false) -> some View {
-        HStack {
-            Text(title)
-                .font(.system(size: 17))
-                .foregroundStyle(Color.inkMuted)
-            Spacer()
-            Text(value)
-                .font(bold ? .system(size: 17, weight: .bold) : .plexMono(20, weight: .medium))
-                .foregroundStyle(Color.ink)
-        }
     }
 
     private var infoNote: some View {
@@ -126,15 +114,8 @@ struct BillDetailsView: View {
     }
 
     private var payButton: some View {
-        Button {
+        PrimaryButton("Pay 253.20 EGP") {
             
-        } label: {
-            Text("Pay 253.20 EGP")
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .frame(height: 58)
-                .background(Color.appPrimary, in: RoundedRectangle(cornerRadius: 20))
         }
     }
     
