@@ -27,6 +27,7 @@ struct PaymentSuccessView: View {
                 .padding(.bottom, 8)
             }
         }
+        .containerBackground(Color.ground, for: .navigation)
         .navigationBarBackButtonHidden()
     }
 
@@ -122,19 +123,22 @@ struct PaymentSuccessView: View {
         .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.inkMuted.opacity(0.3)))
     }
 
-
-    private var shareButton: some View {
-        ShareLink(item: "Payment receipt\nCairo Electricity\nAmount: 253.20 EGP\nReference: MP-20260920-5521") {
-            Label("Share receipt", systemImage: "square.and.arrow.up")
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(Color.ink)
-                .frame(maxWidth: .infinity)
-                .frame(height: 58)
-                .background(Color.white, in: RoundedRectangle(cornerRadius: 20))
-                .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.inkMuted.opacity(0.3)))
+    private var receiptView: some View {
+        VStack(spacing: 16) {
+            header
+            detailsCard
+                .padding(.horizontal, 12)
+            Spacer()
         }
+        .frame(width: 390, height: 700)
+        .background(Color.ground)
     }
 
+    private var shareButton: some View {
+        ShareButton("Share receipt", previewTitle: "Payment receipt") {
+            receiptView
+        }
+    }
 
     private var doneButton: some View {
         PrimaryButton("Done") {

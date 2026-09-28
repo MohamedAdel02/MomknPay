@@ -11,8 +11,9 @@ import SwiftUI
 struct MomknPayApp: App {
     var body: some Scene {
         WindowGroup {
-            PaymentSuccessView()
-                .background(Color.ground.ignoresSafeArea())
+            NavigationStack {
+                BillDetailsView()
+            }
         }
     }
 }

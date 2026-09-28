@@ -10,6 +10,7 @@ import SwiftUI
 struct BillDetailsView: View {
     
     @State private var viewModel = BillDetailsViewModel()
+    @State private var showSuccess = false
 
     var body: some View {
         VStack(spacing: 18) {
@@ -26,10 +27,14 @@ struct BillDetailsView: View {
             cancelButton
 
         }
+        .containerBackground(Color.ground, for: .navigation)
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
         .navigationTitle("Bill Details")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(isPresented: $showSuccess) {
+            PaymentSuccessView()
+        }
         .onAppear { viewModel.onAppear() }
         .onDisappear { viewModel.onDisappear() }
 
@@ -115,7 +120,7 @@ struct BillDetailsView: View {
 
     private var payButton: some View {
         PrimaryButton("Pay 253.20 EGP") {
-            
+            showSuccess = true
         }
     }
     
