@@ -29,9 +29,7 @@ struct BillDetailsView: View {
         }
         .containerBackground(Color.ground, for: .navigation)
         .padding(.horizontal, 16)
-        .padding(.vertical, 8)
-        .navigationTitle("Bill Details")
-        .navigationBarTitleDisplayMode(.inline)
+        .padding(.bottom, 8)
         .navigationDestination(isPresented: $showSuccess) {
             PaymentSuccessView()
         }
