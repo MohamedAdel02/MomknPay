@@ -12,11 +12,7 @@ struct MomknPayApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack {
-<<<<<<< Updated upstream
-                BillDetailsView()
-=======
                 ServicesView()
->>>>>>> Stashed changes
             }
         }
     }
