@@ -9,6 +9,8 @@ import SwiftUI
 
 struct FeesInquiryView: View {
 
+    let service: Service
+
     @State var viewModel = FeesInquiryViewModel()
     @FocusState private var isFocused: Bool
 
@@ -44,13 +46,23 @@ struct FeesInquiryView: View {
 
             
         }
-        .containerBackground(Color.ground, for: .navigation)
+        .navigationTitle("Fees Inquiry")
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
         .contentShape(Rectangle())
         .onTapGesture {
             isFocused = false
         }
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("Fees Inquiry")
+                    .font(.headline)
+                    .foregroundStyle(Color.ink)
+            }
+        }
+        .tint(Color.ink) 
+        .containerBackground(Color.ground, for: .navigation)
     }
 
 
@@ -62,7 +74,7 @@ struct FeesInquiryView: View {
                 .frame(width: 56, height: 56)
                 .background(Color.appPrimary.opacity(0.1), in: RoundedRectangle(cornerRadius: 16))
 
-            Text("Cairo Electricity")
+            Text(service.name)
                 .font(.system(size: 18, weight: .bold))
                 .foregroundStyle(Color.ink)
 
@@ -94,5 +106,5 @@ struct FeesInquiryView: View {
 
 
 #Preview {
-    FeesInquiryView()
+    FeesInquiryView(service: Service(id: 1, name: "Cairo Electricity", available: true))
 }
