@@ -6,26 +6,21 @@
 //
 import SwiftUI
 
-struct Service: Identifiable, Codable, Hashable {
-    
-    let id: Int
-    let name: String
-    let available: Bool
+struct ServicesResponse: Decodable {
+    let syncedAt: Date
+    let items: [Service]
 }
 
-typealias ServicesResponse = [String: [Service]]
-
-extension ServicesResponse {
-    static let dummy: ServicesResponse = [
-        "electricity": [
-            Service(id: 1, name: "Cairo Electricity", available: true),
-            Service(id: 2, name: "Alexandria Electricity", available: false)
-        ],
-        "water": [
-            Service(id: 3, name: "Greater Cairo Water", available: true)
-        ],
-        "gas": [
-            Service(id: 4, name: "Town Gas", available: true)
-        ]
-    ]
+struct Service: Decodable {
+    let id: String
+    let nameEn: String
+    let nameAr: String
+    let category: String
+    let iconUrl: String?
+    let inputLabel: String
+    let inputPattern: String
+    let minAmount: Int
+    let maxAmount: Int
+    let isActive: Bool
+    let updatedAt: Date
 }
