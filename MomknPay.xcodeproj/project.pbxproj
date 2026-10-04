@@ -6,6 +6,10 @@
 	objectVersion = 110;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		D918CC3530726C9800BEF016 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = D918CC3430726C9800BEF016 /* Kingfisher */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		D91668B43063F42B00E71295 /* MomknPay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MomknPay.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -35,6 +39,7 @@
 		D91668B13063F42B00E71295 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				D918CC3530726C9800BEF016 /* Kingfisher in Frameworks */,
 			);
 		};
 /* End PBXFrameworksBuildPhase section */
@@ -73,6 +78,9 @@
 				D91668B63063F42B00E71295 /* MomknPay */,
 			);
 			name = MomknPay;
+			packageProductDependencies = (
+				D918CC3430726C9800BEF016 /* Kingfisher */,
+			);
 			productName = MomknPay;
 			productReference = D91668B43063F42B00E71295 /* MomknPay.app */;
 			productType = "com.apple.product-type.application";
@@ -101,6 +109,9 @@
 			);
 			mainGroup = D91668AB3063F42B00E71295;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				D918CC3330726C9800BEF016 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D91668B53063F42B00E71295 /* Products */;
 			projectDirPath = "";
@@ -337,6 +348,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		D918CC3330726C9800BEF016 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.13.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D918CC3430726C9800BEF016 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D918CC3330726C9800BEF016 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = D91668AC3063F42B00E71295 /* Project object */;
 	validationLevel = 1;

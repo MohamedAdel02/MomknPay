@@ -134,4 +134,36 @@ enum NetworkError: LocalizedError, Equatable {
             return String(localized: "Something went wrong: \(message)")
         }
     }
+    
+    var allowsCacheFallback: Bool {
+        switch self {
+        case .noConnectivity, .timeout, .server:
+            return true
+        case .api(let code, _, _):
+            return code == .serviceUnavailable || code == .rateLimited
+        default:
+            return false
+        }
+    }
+}
+
+
+extension NetworkError {
+
+    var symbolName: String {
+        switch self {
+        case .noConnectivity: return "wifi.slash"
+        case .timeout:        return "clock.badge.exclamationmark"
+        case .server:         return "server.rack"
+        default:              return "exclamationmark.triangle"
+        }
+    }
+
+    var title: String {
+        switch self {
+        case .noConnectivity: return String(localized: "You're offline")
+        case .timeout:        return String(localized: "Taking too long")
+        default:              return String(localized: "Couldn't load services")
+        }
+    }
 }

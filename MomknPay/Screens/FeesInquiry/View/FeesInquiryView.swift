@@ -74,7 +74,7 @@ struct FeesInquiryView: View {
                 .frame(width: 56, height: 56)
                 .background(Color.appPrimary.opacity(0.1), in: RoundedRectangle(cornerRadius: 16))
 
-            Text(service.name)
+            Text(service.nameEn)
                 .font(.system(size: 18, weight: .bold))
                 .foregroundStyle(Color.ink)
 
@@ -105,6 +105,6 @@ struct FeesInquiryView: View {
 }
 
 
-#Preview {
-    FeesInquiryView(service: Service(id: 1, name: "Cairo Electricity", available: true))
-}
+//#Preview {
+//    FeesInquiryView(service: Service(id: 1, name: "Cairo Electricity", available: true))
+//}

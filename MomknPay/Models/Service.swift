@@ -6,7 +6,13 @@
 //
 import SwiftUI
 
-struct ServicesResponse: Decodable {
+struct ServiceSection: Identifiable {
+    let title: String
+    let items: [Service]
+    var id: String { title }
+}
+
+struct ServicesResponse: Codable {
     let syncedAt: Date
     let items: [Service]
 }
@@ -23,4 +29,11 @@ struct Service: Decodable {
     let maxAmount: Int
     let isActive: Bool
     let updatedAt: Date
+
+    var available: Bool { isActive }
+
+    func matches(_ query: String) -> Bool {
+        nameEn.localizedCaseInsensitiveContains(query) || nameAr.localizedCaseInsensitiveContains(query)
+    }
+
 }
