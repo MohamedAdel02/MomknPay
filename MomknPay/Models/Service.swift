@@ -17,7 +17,7 @@ struct ServicesResponse: Codable {
     let items: [Service]
 }
 
-struct Service: Codable, Identifiable, Hashable {
+struct Service: Decodable {
     let id: String
     let nameEn: String
     let nameAr: String
@@ -35,4 +35,5 @@ struct Service: Codable, Identifiable, Hashable {
     func matches(_ query: String) -> Bool {
         nameEn.localizedCaseInsensitiveContains(query) || nameAr.localizedCaseInsensitiveContains(query)
     }
+
 }
