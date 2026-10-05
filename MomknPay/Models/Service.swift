@@ -17,7 +17,7 @@ struct ServicesResponse: Codable {
     let items: [Service]
 }
 
-struct Service: Decodable {
+struct Service: Codable, Hashable, Identifiable {
     let id: String
     let nameEn: String
     let nameAr: String

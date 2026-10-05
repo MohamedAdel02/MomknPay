@@ -111,17 +111,17 @@ struct ServicesView: View {
                             .foregroundStyle(Color.inkMuted)
 
                         ForEach(section.items) { service in
-//                            if service.available {
-//                                NavigationLink(value: service) {
-//                                    ServiceRow(service: service)
-//                                }
-//                                .buttonStyle(.plain)
-//                                .simultaneousGesture(
-//                                    TapGesture().onEnded { isSearchFocused = false }
-//                                )
-//                            } else {
+                            if service.available {
+                                NavigationLink(value: service) {
+                                    ServiceRow(service: service)
+                                }
+                                .buttonStyle(.plain)
+                                .simultaneousGesture(
+                                    TapGesture().onEnded { isSearchFocused = false }
+                                )
+                            } else {
                                 ServiceRow(service: service)
-//                            }
+                            }
                         }
                     }
                 }
