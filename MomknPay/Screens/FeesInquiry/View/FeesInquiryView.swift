@@ -61,7 +61,7 @@ struct FeesInquiryView: View {
                     .foregroundStyle(Color.ink)
             }
         }
-        .tint(Color.ink) 
+        .tint(Color.ink)
         .containerBackground(Color.ground, for: .navigation)
 
     }

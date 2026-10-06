@@ -12,7 +12,7 @@ struct InquiryRequest: Codable {
     let payload: String
 }
  
-struct InquiryResponse: Codable {
+struct InquiryResponse: Codable, Hashable {
     let inquiryId: String
     let serviceId: String
     let customerName: String
