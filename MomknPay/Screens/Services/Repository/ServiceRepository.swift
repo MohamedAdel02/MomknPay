@@ -24,7 +24,7 @@ final class ServiceRepository: ServiceRepositoryProtocol {
     private let network: NetworkManager
     private let cache: ServiceCaching
 
-    init(network: NetworkManager = .shared, cache: ServiceCaching = FileServiceCache()) {
+    init(network: NetworkManager = .shared, cache: ServiceCaching) {
         self.network = network
         self.cache = cache
     }
@@ -33,12 +33,12 @@ final class ServiceRepository: ServiceRepositoryProtocol {
         do {
             let request = try Endpoint.services.asHTTPRequest()
             let response = try await network.send(request, as: ServicesResponse.self)
-            cache.save(response)
+            await cache.save(response)
             return ServicesSnapshot(services: response.items, syncedAt: response.syncedAt, isStale: false)
 
         } catch let error as NetworkError where error.allowsCacheFallback {
             // Network-level problem: show the saved list if we have one.
-            guard let cached = cache.load() else { throw error }
+            guard let cached = await cache.load() else { throw error }
             return ServicesSnapshot(services: cached.items, syncedAt: cached.syncedAt, isStale: true)
         }
     }

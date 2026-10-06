@@ -20,7 +20,7 @@ class BillDetailsViewModel {
     private(set) var remaining: Int
     private var timerTask: Task<Void, Never>?
 
-    init(inquiry: InquiryResponse, service: Service, subscriberNumber: String, remaining: Int = 272) {
+    init(inquiry: InquiryResponse, service: Service, subscriberNumber: String, remaining: Int = 299) {
         self.inquiry = inquiry
         self.service = service
         self.subscriberNumber = subscriberNumber
