@@ -12,7 +12,7 @@ struct MomknPayApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack {
-                ServicesView()
+                ServicesView(viewModel: ServicesViewModel())
             }
         }
     }

@@ -8,7 +8,7 @@
 import Foundation
 
 @Observable
-final class BillDetailsViewModel {
+class BillDetailsViewModel {
 
     let inquiry: InquiryResponse
     let service: Service

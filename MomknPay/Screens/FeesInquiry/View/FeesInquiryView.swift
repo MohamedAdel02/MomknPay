@@ -9,34 +9,27 @@ import SwiftUI
 import Kingfisher
 
 struct FeesInquiryView: View {
-
-    let service: Service
-
-    @State private var viewModel: FeesInquiryViewModel
+ 
+    @State var viewModel: FeesInquiryViewModel
     @FocusState private var isFocused: Bool
-
-    init(service: Service, viewModel: FeesInquiryViewModel? = nil) {
-        self.service = service
-        _viewModel = State(initialValue: viewModel ?? FeesInquiryViewModel(service: service))
-    }
-
+ 
     var body: some View {
         VStack(spacing: 24) {
-
+ 
             providerCard
-
+ 
             VStack(alignment: .leading, spacing: 10) {
-                Text(service.inputLabel)
+                Text(viewModel.service.inputLabel)
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(Color.inkMuted)
-
+ 
                 subscriberField
-
+ 
                 feedback
             }
-
+ 
             Spacer()
-
+ 
             PrimaryButton(viewModel.isLoading ? "" : "Check My Bill") {
                 isFocused = false
                 Task { await viewModel.submit() }
@@ -63,54 +56,28 @@ struct FeesInquiryView: View {
         }
         .tint(Color.ink)
         .containerBackground(Color.ground, for: .navigation)
-
+        .navigationDestination(item: $viewModel.inquiry) { inquiry in
+            BillDetailsView(viewModel: BillDetailsViewModel( inquiry: inquiry, service: viewModel.service, subscriberNumber: viewModel.rawDigits))
+        }
     }
-
-
+ 
+ 
     private var providerCard: some View {
         HStack(spacing: 14) {
-            icon
-
-            Text(service.nameEn)
+            ServiceIcon(service: viewModel.service)
+ 
+            Text(viewModel.service.nameEn)
                 .font(.system(size: 18, weight: .bold))
                 .foregroundStyle(Color.ink)
-
+ 
             Spacer()
         }
         .padding(16)
         .background(Color.white, in: RoundedRectangle(cornerRadius: 20))
         .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.ink.opacity(0.1)))
     }
-    
-    
-    private var icon: some View {
-        Group {
-            if let urlString = service.iconUrl, let url = URL(string: urlString) {
-                KFImage(url)
-                    .placeholder { placeholderIcon }
-                    .fade(duration: 0.2)
-                    .cancelOnDisappear(true)
-                    .resizable()
-                    .scaledToFit()
-                    .padding(12)
-            } else {
-                placeholderIcon
-            }
-        }
-        .frame(width: 56, height: 56)
-        .background(
-            Color.inkMuted.opacity(0.12),
-            in: RoundedRectangle(cornerRadius: 16, style: .continuous)
-        )
-    }
  
-    private var placeholderIcon: some View {
-        Image(systemName: "square.grid.2x2")
-            .font(.title2)
-            .foregroundStyle(service.available ? Color.ink : Color.inkMuted)
-    }
-
-
+ 
     private var subscriberField: some View {
         TextField("", text: $viewModel.displayText)
             .keyboardType(.numberPad)
@@ -122,12 +89,18 @@ struct FeesInquiryView: View {
             .frame(height: 64)
             .background(Color.white, in: RoundedRectangle(cornerRadius: 18))
             .overlay(
-                RoundedRectangle(cornerRadius: 18).stroke(Color.ink.opacity(0.5), lineWidth: 1.5))
+                RoundedRectangle(cornerRadius: 18)
+                    .stroke(borderColor, lineWidth: 1.5)
+            )
             .onChange(of: viewModel.displayText) {
                 viewModel.formatSubscriberNumber()
             }
     }
-
+ 
+    private var borderColor: Color {
+        viewModel.errorMessage == nil ? Color.ink.opacity(0.5) : Color.warning
+    }
+ 
     @ViewBuilder
     private var feedback: some View {
         if let message = viewModel.errorMessage {
@@ -150,3 +123,4 @@ struct FeesInquiryView: View {
         }
     }
 }
+ 

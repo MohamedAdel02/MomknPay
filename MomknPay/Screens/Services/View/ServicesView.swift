@@ -14,7 +14,6 @@ struct ServicesView: View {
     @FocusState private var isSearchFocused: Bool
     @Environment(\.showToast) private var showToast
 
-
     var body: some View {
 
         VStack(spacing: 12) {
