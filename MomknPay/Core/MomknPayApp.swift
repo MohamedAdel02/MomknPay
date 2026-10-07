@@ -12,6 +12,7 @@ import SwiftData
 struct MomknPayApp: App {
 
     private let repository: ServiceRepositoryProtocol
+    @State private var path = NavigationPath()
 
     init() {
         let container = try! ModelContainer(for: CachedService.self)
@@ -20,10 +21,12 @@ struct MomknPayApp: App {
 
     var body: some Scene {
         WindowGroup {
-            NavigationStack {
+            NavigationStack(path: $path) {
                 //ServicesView(viewModel: ServicesViewModel(repository: repository))
                 ServicesView(viewModel: ServicesViewModel(repository: MockServiceRepository()))
             }
+            .environment(\.popToRoot, PopToRootAction { path = NavigationPath() })
+            .withToast() // outside the stack, so the toast survives the pop
         }
     }
 }

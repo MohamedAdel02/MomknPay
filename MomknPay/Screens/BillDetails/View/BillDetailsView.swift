@@ -11,7 +11,11 @@ struct BillDetailsView: View {
 
     @State var viewModel: BillDetailsViewModel
     @State private var showSuccess = false
+    @State private var showExpiredAlert = false
     @Environment(\.dismiss) private var dismiss
+    
+    @Environment(\.showToast) private var showToast
+    @Environment(\.popToRoot) private var popToRoot
 
     var body: some View {
         VStack(spacing: 18) {
@@ -36,6 +40,14 @@ struct BillDetailsView: View {
         }
         .onAppear { viewModel.onAppear() }
         .onDisappear { viewModel.onDisappear() }
+        .onChange(of: viewModel.isExpired) { _, expired in
+            if expired { showExpiredAlert = true }
+        }
+        .alert("Quote expired", isPresented: $showExpiredAlert) {
+            Button("OK") { popToRoot() }
+        } message: {
+            Text("Your quote has expired. Please start again.")
+        }
     }
 
     private var expiryBanner: some View {
