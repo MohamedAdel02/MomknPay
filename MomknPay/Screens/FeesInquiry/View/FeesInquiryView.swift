@@ -79,7 +79,12 @@ struct FeesInquiryView: View {
  
  
     private var subscriberField: some View {
-        TextField("", text: $viewModel.displayText)
+        TextField("",
+                  text: $viewModel.displayText,
+                  prompt: Text("10-digit number")
+                            .font(.system(size: 18))
+                            .foregroundColor(Color.inkMuted.opacity(0.5))
+            )
             .keyboardType(.numberPad)
             .focused($isFocused)
             .disabled(viewModel.isLoading)

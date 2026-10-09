@@ -16,12 +16,12 @@ struct ServiceRow: View {
     }
 
     var body: some View {
-        HStack(spacing: 14) {
+        HStack(spacing: 10) {
             ServiceIcon(service: service)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(service.nameEn)
-                    .font(.system(size: 17, weight: .bold))
+                    .font(.system(size: 16, weight: .bold))
                     .foregroundStyle(service.available ? Color.ink : Color.inkMuted)
 
                 if !service.nameAr.isEmpty {
@@ -33,7 +33,7 @@ struct ServiceRow: View {
             .lineLimit(1)
             .minimumScaleFactor(0.85)
 
-            Spacer(minLength: 2)
+            Spacer(minLength: 1)
 
             trailing
         }
@@ -58,8 +58,7 @@ struct ServiceRow: View {
                 .lineLimit(1)
                 .fixedSize(horizontal: true, vertical: false)
                 .foregroundStyle(Color.warning)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 8)
+                .padding(8)
                 .background(Color.warning.opacity(0.15), in: Capsule())
         }
     }

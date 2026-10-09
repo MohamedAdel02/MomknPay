@@ -10,6 +10,7 @@ import SwiftUI
 struct PaymentSuccessView: View {
 
     @State private var copied = false
+    @Environment(\.popToRoot) private var popToRoot
 
     var body: some View {
         VStack(spacing: 16) {
@@ -142,7 +143,7 @@ struct PaymentSuccessView: View {
 
     private var doneButton: some View {
         PrimaryButton("Done") {
-            
+            popToRoot()
         }
     }
 

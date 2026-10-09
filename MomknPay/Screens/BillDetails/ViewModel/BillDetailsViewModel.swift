@@ -20,7 +20,7 @@ class BillDetailsViewModel {
     private(set) var remaining: Int
     private var timerTask: Task<Void, Never>?
 
-    init(inquiry: InquiryResponse, service: Service, subscriberNumber: String, remaining: Int = 10) {
+    init(inquiry: InquiryResponse, service: Service, subscriberNumber: String, remaining: Int = 299) {
         self.inquiry = inquiry
         self.service = service
         self.subscriberNumber = subscriberNumber
@@ -55,12 +55,12 @@ class BillDetailsViewModel {
         return date.formatted(.dateTime.month(.wide).year())
     }
 
-    func onAppear() {
-        startTimer()
+    func pauseTimer() {
+        stopTimer()
     }
 
-    func onDisappear() {
-        stopTimer()
+    func resumeTimer() {
+        startTimer()
     }
 
     private func startTimer() {

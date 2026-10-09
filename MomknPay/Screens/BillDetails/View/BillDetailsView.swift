@@ -12,6 +12,8 @@ struct BillDetailsView: View {
     @State var viewModel: BillDetailsViewModel
     @State private var showSuccess = false
     @State private var showExpiredAlert = false
+    @State private var showPin = false
+    @State private var pinVerified = false
     @Environment(\.dismiss) private var dismiss
     
     @Environment(\.showToast) private var showToast
@@ -38,8 +40,8 @@ struct BillDetailsView: View {
         .navigationDestination(isPresented: $showSuccess) {
             PaymentSuccessView()
         }
-        .onAppear { viewModel.onAppear() }
-        .onDisappear { viewModel.onDisappear() }
+        .onAppear { viewModel.resumeTimer() }
+        .onDisappear { viewModel.pauseTimer() }
         .onChange(of: viewModel.isExpired) { _, expired in
             if expired { showExpiredAlert = true }
         }
@@ -47,6 +49,25 @@ struct BillDetailsView: View {
             Button("OK") { popToRoot() }
         } message: {
             Text("Your quote has expired. Please start again.")
+        }
+        .sheet(isPresented: $showPin, onDismiss: {
+            if pinVerified {
+                pinVerified = false
+                showSuccess = true
+            }
+        }) {
+            PinView(viewModel: PinViewModel(
+                amountText: viewModel.totalText,
+                serviceName: viewModel.service.nameEn,
+                onVerified: { pinVerified = true }
+            ))
+        }
+        .onChange(of: showPin) { _, isShowing in
+            if isShowing {
+                viewModel.pauseTimer()
+            } else if !pinVerified {
+                viewModel.resumeTimer()
+            }
         }
     }
 
@@ -130,7 +151,7 @@ struct BillDetailsView: View {
 
     private var payButton: some View {
         PrimaryButton("Pay \(viewModel.totalText) \(viewModel.currency)") {
-            showSuccess = true
+            showPin = true
         }
         .disabled(viewModel.isExpired)
         .opacity(viewModel.isExpired ? 0.5 : 1)
