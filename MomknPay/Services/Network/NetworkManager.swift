@@ -18,6 +18,17 @@ class NetworkManager {
         self.decoder = decoder
     }
 
+    // TODO: enable SSL pinning
+    // init(session: URLSession = NetworkManager.makePinnedSession(), decoder: JSONDecoder = .api) {
+    //     self.session = session
+    //     self.decoder = decoder
+    // }
+    //
+    // /// URLSession that uses SSLPinning as its delegate.
+    // static func makePinnedSession() -> URLSession {
+    //     URLSession(configuration: .default, delegate: SSLPinning(), delegateQueue: nil)
+    // }
+ 
     func send<T: Decodable>(_ request: HTTPRequest, as type: T.Type) async throws -> T {
         let data = try await execute(request)
         do {
