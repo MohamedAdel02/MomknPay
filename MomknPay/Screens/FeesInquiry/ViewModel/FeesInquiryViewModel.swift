@@ -32,7 +32,7 @@ class FeesInquiryViewModel {
     // MARK: Derived state
  
     var rawDigits: String {
-        displayText.filter(\.isNumber)
+        displayText.filter { $0.isASCII && $0.isNumber }
     }
  
     var isComplete: Bool {

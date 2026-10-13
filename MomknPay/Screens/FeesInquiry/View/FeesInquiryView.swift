@@ -85,7 +85,7 @@ struct FeesInquiryView: View {
                             .font(.system(size: 18))
                             .foregroundColor(Color.inkMuted.opacity(0.5))
             )
-            .keyboardType(.numberPad)
+            .keyboardType(.asciiCapableNumberPad)
             .focused($isFocused)
             .disabled(viewModel.isLoading)
             .font(.plexMono(28, weight: .medium))
