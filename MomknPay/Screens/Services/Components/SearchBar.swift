@@ -16,17 +16,24 @@ struct SearchBar: View {
         HStack(spacing: 12) {
             Image(systemName: "magnifyingglass")
                 .foregroundStyle(Color.inkMuted)
-            TextField(
-                "Search services",
-                text: $text,
-                prompt: Text("Search services").foregroundColor(Color.inkMuted).bold()
-            )
-            .foregroundStyle(Color.ink)
-            .bold()
-            .focused(isFocused)
-            .submitLabel(.search)
-            .autocorrectionDisabled()
-            .textInputAutocapitalization(.never)
+            ZStack(alignment: .leading) {
+                if text.isEmpty {
+                    Text("Search services")
+                        .foregroundStyle(Color.inkMuted)
+                        .bold()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .environment(\.layoutDirection, .leftToRight)
+                        .allowsHitTesting(false)
+                }
+
+                TextField("Search services", text: $text, prompt: Text(""))
+                    .foregroundStyle(Color.ink)
+                    .bold()
+                    .focused(isFocused)
+                    .submitLabel(.search)
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.never)
+            }
         }
         .padding(.horizontal, 16)
         .frame(height: 52)
