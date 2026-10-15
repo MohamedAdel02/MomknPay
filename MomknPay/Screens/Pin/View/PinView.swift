@@ -45,6 +45,16 @@ struct PinView: View {
         .onChange(of: viewModel.isVerified) { _, verified in
             if verified { dismiss() }
         }
+        .alert("Face ID is unavailable", isPresented: $viewModel.showBiometricUnavailableAlert) {
+            Button("Open Settings") {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            }
+            Button("Use PIN", role: .cancel) { }
+        } message: {
+            Text("Allow Face ID for MomknPay in Settings, or enter your PIN instead.")
+        }
     }
     
     private var dragIndicator: some View {
@@ -129,16 +139,22 @@ struct PinView: View {
     }
 
     private var biometricKey: some View {
-        Button {
-            Task { await viewModel.confirmWithBiometrics() }
-        } label: {
-            Image(systemName: "faceid")
-                .font(.system(size: 26))
-                .foregroundStyle(Color.inkMuted)
-                .frame(maxWidth: .infinity)
-                .frame(height: 66)
+        Group {
+            if let icon = viewModel.biometricIcon {
+                Button {
+                    Task { await viewModel.confirmWithBiometrics() }
+                } label: {
+                    Image(systemName: icon)
+                        .font(.system(size: 26))
+                        .foregroundStyle(Color.inkMuted)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 66)
+                }
+                .disabled(viewModel.isInputDisabled)
+            } else {
+                Color.clear.frame(maxWidth: .infinity).frame(height: 66)
+            }
         }
-        .disabled(viewModel.isInputDisabled)
     }
 
     private var deleteKey: some View {
