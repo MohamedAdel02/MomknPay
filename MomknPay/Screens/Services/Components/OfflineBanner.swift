@@ -28,10 +28,11 @@ struct OfflineBanner: View {
         }
         .foregroundStyle(Color.warning)
         .padding(.horizontal, 16)
-        .frame(height: 52)
+        .frame(height: 50)
         .background(Color.warning.opacity(0.12), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(Color.warning.opacity(0.3)))
         .accessibilityElement(children: .combine)
+        .padding(.top, 10)
     }
 
     static func ago(_ date: Date, now: Date = Date()) -> String {

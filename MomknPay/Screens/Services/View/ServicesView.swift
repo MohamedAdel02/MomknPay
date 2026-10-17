@@ -21,10 +21,6 @@ struct ServicesView: View {
             header
             SearchBar(text: $viewModel.query, isFocused: $isSearchFocused)
 
-            if viewModel.isStale, let syncedAt = viewModel.syncedAt {
-                OfflineBanner(syncedAt: syncedAt)
-            }
-
             content
         }
         .containerBackground(Color.ground, for: .navigation)
@@ -95,6 +91,11 @@ struct ServicesView: View {
 
     private var list: some View {
         ScrollView {
+            
+            if viewModel.isStale, let syncedAt = viewModel.syncedAt {
+                OfflineBanner(syncedAt: syncedAt)
+            }
+            
             VStack(alignment: .leading, spacing: 20) {
 
                 ForEach(viewModel.sections) { section in
@@ -125,6 +126,7 @@ struct ServicesView: View {
             .padding(.top, 4)
             .padding(.bottom, 24)
         }
+        .scrollIndicators(.hidden)
         .scrollDismissesKeyboard(.immediately)
         .refreshable { await viewModel.load() }
         .onTapGesture { isSearchFocused = false }

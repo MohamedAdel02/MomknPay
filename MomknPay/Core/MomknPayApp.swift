@@ -22,11 +22,11 @@ struct MomknPayApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack(path: $path) {
-                //ServicesView(viewModel: ServicesViewModel(repository: repository))
-                ServicesView(viewModel: ServicesViewModel(repository: MockServiceRepository()))
+                ServicesView(viewModel: ServicesViewModel(repository: repository))
+//                ServicesView(viewModel: ServicesViewModel(repository: MockServiceRepository()))
             }
             .environment(\.popToRoot, PopToRootAction { path = NavigationPath() })
-            .withToast() // outside the stack, so the toast survives the pop
+            .withToast() 
         }
     }
 }
