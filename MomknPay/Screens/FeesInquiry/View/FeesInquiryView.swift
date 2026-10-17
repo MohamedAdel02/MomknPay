@@ -11,6 +11,7 @@ import Kingfisher
 struct FeesInquiryView: View {
  
     @State var viewModel: FeesInquiryViewModel
+    @Environment(\.showToast) private var showToast
     @FocusState private var isFocused: Bool
  
     var body: some View {
@@ -32,6 +33,12 @@ struct FeesInquiryView: View {
  
             PrimaryButton(viewModel.isLoading ? "" : "Check My Bill") {
                 isFocused = false
+
+                guard viewModel.validate() else {
+                    showToast(.error(LocalizedStringKey(viewModel.validationMessage)))
+                    return
+                }
+
                 Task { await viewModel.submit() }
             }
             .disabled(!viewModel.canSubmit)
@@ -81,7 +88,7 @@ struct FeesInquiryView: View {
     private var subscriberField: some View {
         TextField("",
                   text: $viewModel.displayText,
-                  prompt: Text("10-digit number")
+                  prompt: Text(viewModel.hint)
                             .font(.system(size: 18))
                             .foregroundColor(Color.inkMuted.opacity(0.5))
             )
@@ -121,7 +128,7 @@ struct FeesInquiryView: View {
             HStack(spacing: 8) {
                 Image(systemName: "info.circle")
                     .font(.system(size: 14))
-                Text("10 digits, printed at the top of your bill")
+                Text(viewModel.helperText)
                     .font(.system(size: 14))
             }
             .foregroundStyle(Color.inkMuted)

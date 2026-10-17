@@ -19,8 +19,8 @@ class FeesInquiryViewModel {
     private static let useMockData = true
  
     let service: Service
-    let maxDigits = 10
- 
+    let lengthRange: ClosedRange<Int>
+
     var displayText = ""
     var inquiry: InquiryResponse?
  
@@ -28,32 +28,53 @@ class FeesInquiryViewModel {
  
     init(service: Service) {
         self.service = service
+        self.lengthRange = service.inputLengthRange
     }
-    // MARK: Derived state
- 
+    
+    var maxDigits: Int { lengthRange.upperBound }
+
     var rawDigits: String {
         displayText.filter { $0.isASCII && $0.isNumber }
     }
- 
-    var isComplete: Bool {
-        rawDigits.count == maxDigits
+
+    var isValid: Bool {
+        service.isValidInput(rawDigits)
     }
- 
+
+    /// placeholder.
+    var hint: String {
+        lengthRange.lowerBound == lengthRange.upperBound
+            ? String(localized: "\(lengthRange.upperBound) digits")
+            : String(localized: "\(lengthRange.lowerBound) to \(lengthRange.upperBound) digits")
+    }
+    
+    var helperText: String {
+        let digits = lengthRange.lowerBound == lengthRange.upperBound
+            ? "\(lengthRange.upperBound)"
+            : "\(lengthRange.lowerBound) to \(lengthRange.upperBound)"
+
+        return String(localized: "Enter your \(service.inputLabel.lowercased()), \(digits) digits, numbers only")
+    }
+
+    var validationMessage: String {
+        String(localized: "Enter a valid \(service.inputLabel.lowercased()) (\(hint))")
+    }
+
     var isLoading: Bool {
         state == .loading
     }
- 
+
     var canSubmit: Bool {
-        isComplete && !isLoading
+        rawDigits.count >= lengthRange.lowerBound && !isLoading
     }
- 
+
     var errorMessage: String? {
         if case .failed(let error) = state {
             return error.errorDescription
         }
         return nil
     }
- 
+
     private var mockInquiry: InquiryResponse {
         InquiryResponse(
             inquiryId: "inq_8f21",
@@ -74,7 +95,7 @@ class FeesInquiryViewModel {
  
         var result = ""
         for (index, character) in digits.enumerated() {
-            if index == 4 || index == 8 {
+            if index > 0 && index % 4 == 0 {
                 result += " "
             }
             result.append(character)
@@ -89,13 +110,22 @@ class FeesInquiryViewModel {
             state = .idle
         }
     }
- 
+
+    func validate() -> Bool {
+        guard isValid else {
+            state = .failed(.unknown(validationMessage))
+            return false
+        }
+        return true
+    }
+
+
     @MainActor
     func submit() async {
-        guard canSubmit else { return }
- 
+        guard canSubmit, isValid else { return }
+
         state = .loading
- 
+
         do {
             if Self.useMockData {
                 try await Task.sleep(for: .seconds(1))
@@ -115,4 +145,3 @@ class FeesInquiryViewModel {
         }
     }
 }
- 
