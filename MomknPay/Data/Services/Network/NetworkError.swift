@@ -9,6 +9,8 @@ import Foundation
 enum APIErrorCode: String, Equatable {
     case validation          = "VALIDATION_ERROR"
     case unauthorized        = "UNAUTHORIZED"
+    case userNotFound        = "USER_NOT_FOUND"
+    case sessionExpired      = "SESSION_EXPIRED"      
     case subscriberNotFound  = "SUBSCRIBER_NOT_FOUND"
     case billAlreadyPaid     = "BILL_ALREADY_PAID"
     case inquiryExpired      = "INQUIRY_EXPIRED"
@@ -24,6 +26,10 @@ enum APIErrorCode: String, Equatable {
             return String(localized: "Please check the information you entered.")
         case .unauthorized:
             return String(localized: "You are not authorized to perform this action.")
+        case .userNotFound:
+            return String(localized: "User not found.")
+        case .sessionExpired:
+            return String(localized: "Your session has expired. Please try again.")
         case .subscriberNotFound:
             return String(localized: "No bill was found for this subscriber number.")
         case .billAlreadyPaid:

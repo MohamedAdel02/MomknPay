@@ -6,33 +6,34 @@
 //
 
 import Foundation
- 
+
 @Observable
 class FeesInquiryViewModel {
- 
+
     enum InquiryState: Equatable {
         case idle
         case loading
         case failed(NetworkError)
     }
- 
-    private static let useMockData = true
- 
+
+    private static let useMockData = false
+
     let service: Service
     let lengthRange: ClosedRange<Int>
 
     var displayText = ""
     var inquiry: InquiryResponse?
- 
+
     private(set) var state: InquiryState = .idle
- 
+
     init(service: Service) {
         self.service = service
         self.lengthRange = service.inputLengthRange
     }
-    
-    var maxDigits: Int { lengthRange.upperBound }
 
+    var maxDigits: Int { lengthRange.upperBound }
+    private var payloadField = "subscriberNumber"
+    
     var rawDigits: String {
         displayText.filter { $0.isASCII && $0.isNumber }
     }
@@ -47,7 +48,7 @@ class FeesInquiryViewModel {
             ? String(localized: "\(lengthRange.upperBound) digits")
             : String(localized: "\(lengthRange.lowerBound) to \(lengthRange.upperBound) digits")
     }
-    
+
     var helperText: String {
         let digits = lengthRange.lowerBound == lengthRange.upperBound
             ? "\(lengthRange.upperBound)"
@@ -89,10 +90,10 @@ class FeesInquiryViewModel {
             expiresAt: Date().addingTimeInterval(300)
         )
     }
-  
+
     func formatSubscriberNumber() {
         let digits = String(rawDigits.prefix(maxDigits))
- 
+
         var result = ""
         for (index, character) in digits.enumerated() {
             if index > 0 && index % 4 == 0 {
@@ -100,11 +101,11 @@ class FeesInquiryViewModel {
             }
             result.append(character)
         }
- 
+
         if result != displayText {
             displayText = result
         }
- 
+
         // Typing again clears a previous error.
         if case .failed = state {
             state = .idle
@@ -119,7 +120,6 @@ class FeesInquiryViewModel {
         return true
     }
 
-
     @MainActor
     func submit() async {
         guard canSubmit, isValid else { return }
@@ -131,9 +131,7 @@ class FeesInquiryViewModel {
                 try await Task.sleep(for: .seconds(1))
                 inquiry = mockInquiry
             } else {
-                let body = InquiryRequest(serviceId: service.id, payload: rawDigits)
-                let request = try Endpoint.inquiry(body).asHTTPRequest()
-                inquiry = try await NetworkManager.shared.send(request, as: InquiryResponse.self)
+                inquiry = try await performInquiry()
             }
             state = .idle
         } catch let error as NetworkError {
@@ -143,5 +141,29 @@ class FeesInquiryViewModel {
         } catch {
             state = .failed(.unknown(error.localizedDescription))
         }
+    }
+
+    // MARK: - Request
+
+    private func performInquiry() async throws -> InquiryResponse {
+        let session = try await SessionManager.shared.currentSession()
+
+        do {
+            return try await sendInquiry(using: session)
+        } catch NetworkError.api(let code, _, _) where code == .sessionExpired {
+            SessionManager.shared.invalidate()
+            let fresh = try await SessionManager.shared.currentSession()
+            return try await sendInquiry(using: fresh)
+        }
+    }
+
+    private func sendInquiry(using session: CryptoSession) async throws -> InquiryResponse {
+
+        let payload = try EncryptionManager.encrypt(field: payloadField,
+                                                    value: rawDigits,
+                                                    key: session.key)
+        let body = InquiryRequest(serviceId: service.id, payload: payload)
+        let request = try Endpoint.inquiry(body, sessionId: session.id).asHTTPRequest()
+        return try await NetworkManager.shared.send(request, as: InquiryResponse.self)
     }
 }

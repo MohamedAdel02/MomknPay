@@ -26,7 +26,16 @@ struct MomknPayApp: App {
 //                ServicesView(viewModel: ServicesViewModel(repository: MockServiceRepository()))
             }
             .environment(\.popToRoot, PopToRootAction { path = NavigationPath() })
-            .withToast() 
+            .withToast()
+            .task {
+                do {
+                    let session = try await SessionManager.shared.currentSession()
+                    print("Session OK:", session.id)
+                    print(session.expiresAt)
+                } catch {
+                    print("Session failed:", error)
+                }
+            }
         }
     }
 }

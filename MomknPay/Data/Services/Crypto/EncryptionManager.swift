@@ -10,10 +10,8 @@ import CryptoKit
 
 enum EncryptionManager {
 
-    static func encrypt(field: String, value: String, sessionKey: String) throws -> String {
-        
-        let key = try symmetricKey(from: sessionKey)
- 
+    static func encrypt(field: String, value: String, key: SymmetricKey) throws -> String {
+
         let payload: [String: Any] = [
             field: value,
             "nonce": try randomHex(byteCount: 16),

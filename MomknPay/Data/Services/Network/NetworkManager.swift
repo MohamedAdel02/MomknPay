@@ -76,7 +76,8 @@ class NetworkManager {
             "Accept": "application/json",
             "X-Request-Id": UUID().uuidString,
             "X-Client-Platform": "ios",
-            "X-Client-Version": "1.0"
+            "X-Client-Version": "1.0",
+            "X-User-Id": AppConfig.userId
         ]
         
         if request.body != nil { headers["Content-Type"] = "application/json" }
