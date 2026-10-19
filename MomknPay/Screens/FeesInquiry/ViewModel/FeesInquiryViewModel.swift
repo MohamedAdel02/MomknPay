@@ -16,24 +16,26 @@ class FeesInquiryViewModel {
         case failed(NetworkError)
     }
 
-    private static let useMockData = false
-
     let service: Service
     let lengthRange: ClosedRange<Int>
+
+    @ObservationIgnored
+    private let repository: FeesInquiryRepositoryProtocol
 
     var displayText = ""
     var inquiry: InquiryResponse?
 
     private(set) var state: InquiryState = .idle
 
-    init(service: Service) {
+    init(service: Service,
+         repository: FeesInquiryRepositoryProtocol = FeesInquiryRepository()) {
         self.service = service
         self.lengthRange = service.inputLengthRange
+        self.repository = repository
     }
 
     var maxDigits: Int { lengthRange.upperBound }
-    private var payloadField = "subscriberNumber"
-    
+
     var rawDigits: String {
         displayText.filter { $0.isASCII && $0.isNumber }
     }
@@ -76,21 +78,6 @@ class FeesInquiryViewModel {
         return nil
     }
 
-    private var mockInquiry: InquiryResponse {
-        InquiryResponse(
-            inquiryId: "inq_8f21",
-            serviceId: service.id,
-            customerName: "Mohamed Adel",
-            billMonth: "2026-08",
-            amountDue: 24750,
-            serviceFee: 500,
-            vat: 70,
-            total: 25320,
-            currency: "EGP",
-            expiresAt: Date().addingTimeInterval(300)
-        )
-    }
-
     func formatSubscriberNumber() {
         let digits = String(rawDigits.prefix(maxDigits))
 
@@ -127,12 +114,8 @@ class FeesInquiryViewModel {
         state = .loading
 
         do {
-            if Self.useMockData {
-                try await Task.sleep(for: .seconds(1))
-                inquiry = mockInquiry
-            } else {
-                inquiry = try await performInquiry()
-            }
+            inquiry = try await repository.inquire(service: service,
+                                                   subscriberNumber: rawDigits)
             state = .idle
         } catch let error as NetworkError {
             state = error == .cancelled ? .idle : .failed(error)
@@ -141,29 +124,5 @@ class FeesInquiryViewModel {
         } catch {
             state = .failed(.unknown(error.localizedDescription))
         }
-    }
-
-    // MARK: - Request
-
-    private func performInquiry() async throws -> InquiryResponse {
-        let session = try await SessionManager.shared.currentSession()
-
-        do {
-            return try await sendInquiry(using: session)
-        } catch NetworkError.api(let code, _, _) where code == .sessionExpired {
-            SessionManager.shared.invalidate()
-            let fresh = try await SessionManager.shared.currentSession()
-            return try await sendInquiry(using: fresh)
-        }
-    }
-
-    private func sendInquiry(using session: CryptoSession) async throws -> InquiryResponse {
-
-        let payload = try EncryptionManager.encrypt(field: payloadField,
-                                                    value: rawDigits,
-                                                    key: session.key)
-        let body = InquiryRequest(serviceId: service.id, payload: payload)
-        let request = try Endpoint.inquiry(body, sessionId: session.id).asHTTPRequest()
-        return try await NetworkManager.shared.send(request, as: InquiryResponse.self)
     }
 }
