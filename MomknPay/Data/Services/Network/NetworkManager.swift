@@ -34,6 +34,7 @@ class NetworkManager {
         do {
             return try decoder.decode(T.self, from: data)
         } catch {
+            print("decoding \(T.self) failed:", error)
             throw NetworkError.decoding(String(describing: error))
         }
     }

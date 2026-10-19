@@ -16,7 +16,7 @@ struct PaymentSuccessView: View {
     @Environment(\.popToRoot) private var popToRoot
  
     private var paidAtText: String {
-        response.paidAt.formatted(.dateTime.day().month(.abbreviated).year().hour().minute())
+        response.paidAt?.formatted(.dateTime.day().month(.abbreviated).year().hour().minute()) ?? "-"
     }
  
     var body: some View {
