@@ -10,10 +10,7 @@ import SwiftUI
 struct BillDetailsView: View {
 
     @State var viewModel: BillDetailsViewModel
-    @State private var showSuccess = false
     @State private var showExpiredAlert = false
-    @State private var showPin = false
-    @State private var pinVerified = false
     @Environment(\.dismiss) private var dismiss
     
     @Environment(\.showToast) private var showToast
@@ -37,9 +34,6 @@ struct BillDetailsView: View {
         .containerBackground(Color.ground, for: .navigation)
         .padding(.horizontal, 16)
         .padding(.bottom, 8)
-        .navigationDestination(isPresented: $showSuccess) {
-            PaymentSuccessView()
-        }
         .onAppear { viewModel.resumeTimer() }
         .onDisappear { viewModel.pauseTimer() }
         .onChange(of: viewModel.isExpired) { _, expired in
@@ -50,22 +44,24 @@ struct BillDetailsView: View {
         } message: {
             Text("Your quote has expired. Please start again.")
         }
-        .sheet(isPresented: $showPin, onDismiss: {
-            if pinVerified {
-                pinVerified = false
-                showSuccess = true
-            }
+        .sheet(isPresented: $viewModel.showPin, onDismiss: {
+            viewModel.paymentResult = viewModel.pendingResult
+            viewModel.pendingResult = nil
         }) {
-            PinView(viewModel: PinViewModel(
-                amountText: viewModel.totalText,
-                serviceName: viewModel.service.nameEn,
-                onVerified: { pinVerified = true }
-            ))
+            PinView(viewModel: viewModel.makePinViewModel())
         }
-        .onChange(of: showPin) { _, isShowing in
+        .navigationDestination(item: $viewModel.paymentResult) { result in
+            switch result {
+            case .success(let response):
+                PaymentSuccessView(response: response, subscriberNumber: viewModel.subscriberNumber)
+            case .failure(let failure):
+                PaymentFailureView(failure: failure)
+            }
+        }
+        .onChange(of: viewModel.showPin) { _, isShowing in
             if isShowing {
                 viewModel.pauseTimer()
-            } else if !pinVerified {
+            } else if viewModel.paymentResult == nil {
                 viewModel.resumeTimer()
             }
         }
@@ -151,7 +147,7 @@ struct BillDetailsView: View {
 
     private var payButton: some View {
         PrimaryButton("Pay \(viewModel.totalText) \(viewModel.currency)") {
-            showPin = true
+            viewModel.showPin = true
         }
         .disabled(viewModel.isExpired)
         .opacity(viewModel.isExpired ? 0.5 : 1)

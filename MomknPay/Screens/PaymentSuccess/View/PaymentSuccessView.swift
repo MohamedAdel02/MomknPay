@@ -6,16 +6,23 @@
 //
 
 import SwiftUI
-
+ 
 struct PaymentSuccessView: View {
-
+ 
+    let response: ConfirmResponse
+    let subscriberNumber: String
+ 
     @State private var copied = false
     @Environment(\.popToRoot) private var popToRoot
-
+ 
+    private var paidAtText: String {
+        response.paidAt.formatted(.dateTime.day().month(.abbreviated).year().hour().minute())
+    }
+ 
     var body: some View {
         VStack(spacing: 16) {
             header
-            
+ 
             ScrollView {
                 VStack(spacing: 16) {
                     detailsCard
@@ -31,8 +38,8 @@ struct PaymentSuccessView: View {
         .containerBackground(Color.ground, for: .navigation)
         .navigationBarBackButtonHidden()
     }
-
-
+ 
+ 
     private var header: some View {
         VStack(spacing: 14) {
             Image(systemName: "checkmark")
@@ -40,13 +47,13 @@ struct PaymentSuccessView: View {
                 .foregroundStyle(.white)
                 .frame(width: 75, height: 75)
                 .background(Color.white.opacity(0.2), in: Circle())
-
+ 
             Text("Payment successful")
                 .font(.system(size: 17, weight: .medium))
                 .foregroundStyle(.white.opacity(0.9))
-
+ 
             HStack(alignment: .lastTextBaseline, spacing: 8) {
-                Text("253.20")
+                Text(response.totalText)
                     .font(.plexMono(46, weight: .medium))
                 Text("EGP")
                     .font(.system(size: 17, weight: .medium))
@@ -62,19 +69,19 @@ struct PaymentSuccessView: View {
                 .ignoresSafeArea(edges: .top)
         )
     }
-
-
+ 
+ 
     private var detailsCard: some View {
         VStack(spacing: 18) {
-            DetailRow("Service", value: "Cairo Electricity", font: .system(size: 18, weight: .bold))
-            DetailRow("Subscriber", value: "1024750891", font: .plexMono(17, weight: .medium))
-            DetailRow("Paid at", value: "20 Sep 2026, 19:31", font: .system(size: 16, weight: .semibold))
-
+            DetailRow("Service", value: response.service.nameEn, font: .system(size: 18, weight: .bold))
+            DetailRow("Subscriber", value: subscriberNumber, font: .plexMono(17, weight: .medium))
+            DetailRow("Paid at", value: paidAtText, font: .system(size: 16, weight: .semibold))
+ 
             Divider().overlay(Color.inkMuted.opacity(0.3))
-
+ 
             DetailRow("Reference") {
                 HStack(spacing: 12) {
-                    Text("MP-20260920-5521")
+                    Text(response.reference)
                         .font(.plexMono(16, weight: .medium))
                     copyButton
                 }
@@ -84,11 +91,11 @@ struct PaymentSuccessView: View {
         .background(Color.white, in: RoundedRectangle(cornerRadius: 24))
         .overlay(RoundedRectangle(cornerRadius: 24).stroke(Color.inkMuted.opacity(0.3)))
     }
-
-
+ 
+ 
     private var copyButton: some View {
         Button {
-            UIPasteboard.general.string = "MP-20260920-5521"
+            UIPasteboard.general.string = response.reference
             copied = true
             Task {
                 try? await Task.sleep(for: .seconds(1.5))
@@ -102,8 +109,8 @@ struct PaymentSuccessView: View {
                 .background(Color.inkMuted.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
         }
     }
-
-
+ 
+ 
     private var savedNote: some View {
         HStack(spacing: 14) {
             Image(systemName: "checkmark.circle")
@@ -123,7 +130,7 @@ struct PaymentSuccessView: View {
         .background(Color.white, in: RoundedRectangle(cornerRadius: 20))
         .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.inkMuted.opacity(0.3)))
     }
-
+ 
     private var receiptView: some View {
         VStack(spacing: 16) {
             header
@@ -134,22 +141,23 @@ struct PaymentSuccessView: View {
         .frame(width: 390, height: 700)
         .background(Color.ground)
     }
-
+ 
     private var shareButton: some View {
         ShareButton("Share receipt", previewTitle: "Payment receipt") {
             receiptView
         }
     }
-
+ 
     private var doneButton: some View {
         PrimaryButton("Done") {
             popToRoot()
         }
     }
-
-
+ 
+ 
 }
-
+ 
 #Preview {
-        PaymentSuccessView()
+    PaymentSuccessView(response: .sample(), subscriberNumber: "1024750891")
 }
+ 

@@ -42,7 +42,7 @@ struct FeesInquiryView: View {
                 Task { await viewModel.submit() }
             }
             .disabled(!viewModel.canSubmit)
-            .opacity(viewModel.canSubmit || viewModel.isLoading ? 1 : 0.5)
+            .opacity(viewModel.canSubmit && !viewModel.isLoading ? 1 : 0.5)
             .overlay {
                 if viewModel.isLoading {
                     ProgressView().tint(.white)

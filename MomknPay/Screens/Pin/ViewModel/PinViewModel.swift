@@ -11,6 +11,10 @@ import LocalAuthentication
 @Observable
 class PinViewModel {
 
+    static let biometricsEnabled = false
+    static let useMockData = false
+    
+    let inquiryId: String
     let amountText: String
     let serviceName: String
     let pinLength = 4
@@ -23,43 +27,48 @@ class PinViewModel {
     var isVerified = false
     var shakeCount = 0
 
-    /// Checks the PIN. Always true for now; swap in the real call later.
-    private let verifyPin: (String) async -> Bool
+    private let repository: PinRepositoryProtocol
 
     /// Checks biometrics via LocalAuthentication.
     private let verifyBiometric: () async -> BiometricResult
 
-    /// Called once, after the payment has been verified (PIN or biometrics).
-    private let onVerified: () -> Void
+    /// Called once, with the final outcome (success or failure).
+    private let onFinished: (PaymentResult) -> Void
 
-    init(amountText: String,
+    /// One key per payment attempt.
+    private var idempotencyKey = UUID().uuidString
+
+    init(inquiryId: String,
+         amountText: String,
          serviceName: String,
          biometryType: LABiometryType = BiometricAuthenticator.availableType,
          verifyBiometric: @escaping () async -> BiometricResult = {
              await BiometricAuthenticator.authenticate(reason: "Confirm your payment")
          },
-         verifyPin: @escaping (String) async -> Bool = { _ in true },
-         onVerified: @escaping () -> Void
+         repository: PinRepositoryProtocol = PinViewModel.useMockData ? MockPinRepository() : PinRepository(),
+         onFinished: @escaping (PaymentResult) -> Void
     ) {
+        self.inquiryId = inquiryId
         self.amountText = amountText
         self.serviceName = serviceName
         self.biometryType = biometryType
-        self.verifyPin = verifyPin
         self.verifyBiometric = verifyBiometric
-        self.onVerified = onVerified
+        self.repository = repository
+        self.onFinished = onFinished
     }
 
     var canConfirm: Bool { pin.count == pinLength && !isVerifying }
     var isInputDisabled: Bool { isVerifying || isVerified }
-    var canUseBiometrics: Bool { biometryType != .none }
+    var canUseBiometrics: Bool { Self.biometricsEnabled && biometryType != .none }
 
-    /// SF Symbol for the current biometry type, nil when unavailable.
+    /// SF Symbol for the current biometry type, nil when unavailable or disabled.
     var biometricIcon: String? {
+        guard canUseBiometrics else { return nil }
         switch biometryType {
-        case .faceID:  "faceid"
-        case .touchID: "touchid"
-        case .opticID: "opticid"
-        default:       nil
+        case .faceID:  return "faceid"
+        case .touchID: return "touchid"
+        case .opticID: return "opticid"
+        default:       return nil
         }
     }
 
@@ -77,18 +86,28 @@ class PinViewModel {
     }
 
 
+    @MainActor
     func confirm() async {
         guard canConfirm else { return }
         isVerifying = true
-        let isValid = await verifyPin(pin)
-        isVerifying = false
 
-        if isValid {
-            complete()
-        } else {
-            pin = ""
-            showError = true
-            shakeCount += 1
+        do {
+            let response = try await repository.confirm(inquiryId: inquiryId,
+                                                            pin: pin,
+                                                            idempotencyKey: idempotencyKey)
+            isVerifying = false
+
+            switch response.status {
+            case .success: finish(.success(response))
+            case .failed:  finish(.failure(.declined(reference: response.reference)))
+            case .pending: finish(.failure(.pending(reference: response.reference)))
+            }
+        } catch let error as NetworkError {
+            isVerifying = false
+            handle(error)
+        } catch {
+            isVerifying = false
+            finish(.failure(.from(.unknown(error.localizedDescription))))
         }
     }
 
@@ -99,14 +118,30 @@ class PinViewModel {
         isVerifying = false
 
         switch result {
-        case .success:             complete()
-        case .unavailable:         showBiometricUnavailableAlert = true
-        case .cancelled, .failed:  break
+        case .unavailable:
+            showBiometricUnavailableAlert = true
+        case .success, .cancelled, .failed:
+            break
         }
     }
 
-    private func complete() {
+
+    private func handle(_ error: NetworkError) {
+        if error == .cancelled { return }
+
+        if case .api(let code, _, _) = error, code == .invalidPin {
+            pin = ""
+            showError = true
+            shakeCount += 1
+            idempotencyKey = UUID().uuidString   
+            return
+        }
+
+        finish(.failure(.from(error)))
+    }
+
+    private func finish(_ result: PaymentResult) {
         isVerified = true
-        onVerified()
+        onFinished(result)
     }
 }

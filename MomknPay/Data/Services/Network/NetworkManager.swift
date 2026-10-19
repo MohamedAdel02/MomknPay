@@ -53,6 +53,8 @@ class NetworkManager {
                 return data
             }
 
+            print("HTTP \(http.statusCode):", String(data: data, encoding: .utf8) ?? "non-utf8")
+
             let envelope = try? decoder.decode(APIErrorEnvelope.self, from: data)
             throw NetworkError.from(statusCode: http.statusCode, envelope: envelope)
 

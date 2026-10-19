@@ -49,13 +49,14 @@ enum Endpoint {
 
     // Payments
     case inquiry(InquiryRequest, sessionId: String)
+    case confirm(ConfirmRequest, sessionId: String, idempotencyKey: String)
 
     private var environment: APIEnvironment { .production }
 
     private var method: HTTPMethod {
         switch self {
-        case .inquiry, .createSession: return .post
-        case .services:                return .get
+        case .inquiry, .confirm, .createSession: return .post
+        case .services:                          return .get
         }
     }
 
@@ -64,12 +65,14 @@ enum Endpoint {
         case .services:      return "services"
         case .createSession: return "sessions"
         case .inquiry:       return "payments/inquiry"
+        case .confirm:       return "payments/confirm"
         }
     }
 
     private func encodedBody() throws -> Data? {
         switch self {
         case .inquiry(let body, _):     return try JSONEncoder().encode(body)
+        case .confirm(let body, _, _):  return try JSONEncoder().encode(body)
         case .services, .createSession: return nil
         }
     }
@@ -77,6 +80,8 @@ enum Endpoint {
     private var headers: [String: String] {
         switch self {
         case .inquiry(_, let sessionId): return ["X-Session-Id": sessionId]
+        case .confirm(_, let sessionId, let idempotencyKey):
+            return ["X-Session-Id": sessionId, "Idempotency-Key": idempotencyKey]
         case .services, .createSession:  return [:]
         }
     }

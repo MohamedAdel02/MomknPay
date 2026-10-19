@@ -171,11 +171,16 @@ struct PinView: View {
     }
 
     private var confirmButton: some View {
-        PrimaryButton("Confirm payment") {
+        PrimaryButton(viewModel.isVerifying ? "" : "Confirm payment") {
             Task { await viewModel.confirm() }
         }
-        .disabled(!viewModel.canConfirm)
-        .opacity(viewModel.canConfirm ? 1 : 0.5)
+        .disabled(!viewModel.canConfirm || viewModel.isVerifying)
+        .opacity(viewModel.canConfirm && !viewModel.isVerifying ? 1.0 : 0.5)
+        .overlay {
+            if viewModel.isVerifying {
+                ProgressView().tint(.white)
+            }
+        }
     }
 
     private var footerNote: some View {
@@ -184,15 +189,4 @@ struct PinView: View {
             .foregroundStyle(Color.inkMuted)
             .frame(maxWidth: .infinity)
     }
-}
-
-#Preview {
-    Color.gray
-        .sheet(isPresented: .constant(true)) {
-            PinView(viewModel: PinViewModel(
-                amountText: "253.20",
-                serviceName: "Cairo Electricity",
-                onVerified: { }
-            ))
-        }
 }

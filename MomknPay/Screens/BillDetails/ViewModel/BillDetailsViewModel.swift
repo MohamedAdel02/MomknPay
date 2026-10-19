@@ -15,6 +15,10 @@ class BillDetailsViewModel {
     let subscriberNumber: String
 
     private static let quoteDuration: TimeInterval? = 5 * 60
+    
+    var pendingResult: PaymentResult?
+    var paymentResult: PaymentResult?
+    var showPin = false
 
     private let deadline: Date
     private(set) var remaining: Int
@@ -94,4 +98,12 @@ class BillDetailsViewModel {
         (Decimal(piastres) / 100).formatted(.number.precision(.fractionLength(2)))
     }
     
+    
+    func makePinViewModel() -> PinViewModel {
+        PinViewModel(inquiryId: inquiry.inquiryId,
+                     amountText: totalText,
+                     serviceName: service.nameEn) { [weak self] result in
+            self?.pendingResult = result
+        }
+    }
 }
