@@ -28,7 +28,7 @@ struct ConfirmResponse: Decodable, Hashable {
     let transactionId: String
     let status: PaymentStatus
     let reference: String
-    let paidAt: Date
+    let paidAt: Date?
     let total: Int
     let service: ServiceInfo
 
@@ -92,19 +92,20 @@ struct PaymentFailure: Hashable {
             return .unconfirmed
  
         case .api(let code, _, _):
-            let retryable = code != .inquiryExpired && code != .insufficientBalance
+            // Retrying only makes sense for temporary problems.
+            let transient: Set<APIErrorCode> = [.serviceUnavailable, .rateLimited]
             return PaymentFailure(title: String(localized: "Payment failed"),
                                   message: error.errorDescription ?? code.fallbackText,
                                   symbolName: "xmark",
                                   reference: nil,
-                                  canRetry: retryable)
- 
+                                  canRetry: transient.contains(code))
+
         default:
             return PaymentFailure(title: String(localized: "Payment failed"),
                                   message: error.errorDescription ?? String(localized: "Something went wrong. Please try again."),
                                   symbolName: "xmark",
                                   reference: nil,
-                                  canRetry: true)
+                                  canRetry: false)
         }
     }
 }

@@ -11,6 +11,7 @@ struct PinView: View {
 
     @State var viewModel: PinViewModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.showToast) private var showToast
     @State private var contentHeight: CGFloat = 520
 
     private let rows: [[String]] = [
@@ -54,6 +55,11 @@ struct PinView: View {
             Button("Use PIN", role: .cancel) { }
         } message: {
             Text("Allow Face ID for MomknPay in Settings, or enter your PIN instead.")
+        }
+        .onChange(of: viewModel.toastMessage) { _, message in
+            guard let message else { return }
+            showToast(.error(LocalizedStringKey(message)))
+            viewModel.toastMessage = nil
         }
     }
     

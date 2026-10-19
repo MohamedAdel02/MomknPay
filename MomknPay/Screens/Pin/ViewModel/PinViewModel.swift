@@ -21,6 +21,7 @@ class PinViewModel {
     let biometryType: LABiometryType
 
     var pin = ""
+    var toastMessage: String?
     var showBiometricUnavailableAlert = false
     var isVerifying = false
     var showError = false
@@ -129,12 +130,25 @@ class PinViewModel {
     private func handle(_ error: NetworkError) {
         if error == .cancelled { return }
 
-        if case .api(let code, _, _) = error, code == .invalidPin {
-            pin = ""
-            showError = true
-            shakeCount += 1
-            idempotencyKey = UUID().uuidString   
-            return
+        if case .api(let code, _, _) = error {
+            switch code {
+            case .invalidPin:
+                pin = ""
+                showError = true
+                shakeCount += 1
+                idempotencyKey = UUID().uuidString
+                return
+
+            case .validation:
+                pin = ""
+                shakeCount += 1
+                toastMessage = String(localized: "Invalid PIN. Please try again.")
+                idempotencyKey = UUID().uuidString
+                return
+
+            default:
+                break
+            }
         }
 
         finish(.failure(.from(error)))
