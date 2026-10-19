@@ -11,6 +11,7 @@ import SwiftData
 @main
 struct MomknPayApp: App {
 
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     private let repository: ServiceRepositoryProtocol
     @State private var path = NavigationPath()
 
