@@ -20,11 +20,11 @@ struct ServicesView: View {
 
             header
             SearchBar(text: $viewModel.query, isFocused: $isSearchFocused)
+                .padding(.horizontal, 20)
 
             content
         }
         .containerBackground(Color.ground, for: .navigation)
-        .padding(.horizontal, 20)
         .padding(.top, 8)
         .contentShape(Rectangle())
         .onTapGesture { isSearchFocused = false }
@@ -92,8 +92,14 @@ struct ServicesView: View {
     private var list: some View {
         ScrollView {
             
+            if !viewModel.isSearching {
+                BannerView()
+            }
+            
+            
             if viewModel.isStale, let syncedAt = viewModel.syncedAt {
                 OfflineBanner(syncedAt: syncedAt)
+                    .padding(.horizontal, 20)
             }
             
             VStack(alignment: .leading, spacing: 20) {
@@ -125,6 +131,7 @@ struct ServicesView: View {
             }
             .padding(.top, 4)
             .padding(.bottom, 24)
+            .padding(.horizontal, 20)
         }
         .scrollIndicators(.hidden)
         .scrollDismissesKeyboard(.immediately)
@@ -144,5 +151,7 @@ struct ServicesView: View {
             }
             Spacer()
         }
+        .padding(.horizontal, 20)
+
     }
 }
