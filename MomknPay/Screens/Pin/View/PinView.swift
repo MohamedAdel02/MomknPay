@@ -52,9 +52,9 @@ struct PinView: View {
                     UIApplication.shared.open(url)
                 }
             }
-            Button("Use PIN", role: .cancel) { }
+            Button("Use CVV", role: .cancel) { }
         } message: {
-            Text("Allow Face ID for MomknPay in Settings, or enter your PIN instead.")
+            Text("Allow Face ID for MomknPay in Settings, or enter your CVV instead.")
         }
         .onChange(of: viewModel.toastMessage) { _, message in
             guard let message else { return }
@@ -75,7 +75,7 @@ struct PinView: View {
 
     private var titleBar: some View {
         
-        Text("Enter your PIN")
+        Text("Enter your CVV")
             .font(.system(size: 22, weight: .bold))
             .foregroundStyle(Color.ink)
     }
@@ -83,7 +83,7 @@ struct PinView: View {
     private var subtitle: some View {
         Group {
             if viewModel.showError {
-                Text("Incorrect PIN. Please try again.")
+                Text("Incorrect CVV. Please try again.")
                     .foregroundStyle(Color.warning)
             } else {
                 Text("Paying \(Text("\(viewModel.amountText) EGP").bold().foregroundColor(.ink)) to \(viewModel.serviceName)")
@@ -190,7 +190,7 @@ struct PinView: View {
     }
 
     private var footerNote: some View {
-        Label("PIN is encrypted and never stored on the device", systemImage: "lock")
+        Label("CVV is encrypted and never stored on the device", systemImage: "lock")
             .font(.system(size: 14))
             .foregroundStyle(Color.inkMuted)
             .frame(maxWidth: .infinity)

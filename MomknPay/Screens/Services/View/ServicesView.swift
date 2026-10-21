@@ -129,7 +129,7 @@ struct ServicesView: View {
                     }
                 }
             }
-            .padding(.top, 4)
+            .padding(.top, 6)
             .padding(.bottom, 24)
             .padding(.horizontal, 20)
         }

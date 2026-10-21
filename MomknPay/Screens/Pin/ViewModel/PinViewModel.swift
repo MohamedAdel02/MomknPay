@@ -17,7 +17,7 @@ class PinViewModel {
     let inquiryId: String
     let amountText: String
     let serviceName: String
-    let pinLength = 4
+    let pinLength = 3
     let biometryType: LABiometryType
 
     var pin = ""
