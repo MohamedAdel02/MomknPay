@@ -93,7 +93,7 @@ struct ServicesView: View {
         ScrollView {
             
             if !viewModel.isSearching {
-                BannerView()
+                BannerView(viewModel: BannerViewModel())
             }
             
             

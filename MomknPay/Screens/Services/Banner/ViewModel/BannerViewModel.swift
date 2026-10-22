@@ -10,27 +10,28 @@ import SwiftUI
 @Observable
 class BannerViewModel {
 
-    let banners: [Banner]
+    var banners: [Banner]
     let autoScrollInterval: TimeInterval = 5
     let repeats = 10
 
     var currentID: Int?
     var lastIndex: Int
 
-    private var hasPositioned = false
+    private let repository: BannerRepositoryProtocol
+    private var hasLoaded = false
     private var isTouching = false
     private var lastInteraction = Date.distantPast
     private var recentreTask: Task<Void, Never>?
 
-    init(banners: [Banner] = Banner.all,) {
-        
+    init(banners: [Banner] = Banner.placeholders,
+         repository: BannerRepositoryProtocol = BannerRepository()) {
         self.banners = banners
+        self.repository = repository
 
         let start = banners.count * (repeats / 2)
         self.currentID = start
         self.lastIndex = start
     }
-
 
     var isEmpty: Bool { banners.isEmpty }
 
@@ -45,6 +46,26 @@ class BannerViewModel {
     func banner(at index: Int) -> Banner {
         banners[index % banners.count]
     }
+
+
+    func load() async {
+        guard !hasLoaded else { return }
+
+        do {
+            let items = try await repository.fetchBanners()
+            hasLoaded = true
+
+            guard !items.isEmpty else { return }
+            banners = items
+
+            let start = middle
+            currentID = start
+            lastIndex = start
+        } catch {
+            print("loading banners failed:", error)
+        }
+    }
+
 
     func positionChanged(_ newValue: Int?) {
         guard let newValue else { return }
@@ -68,8 +89,6 @@ class BannerViewModel {
     /// Moves to the next banner every `autoScrollInterval` seconds until the task is cancelled.
     /// - Parameter step: -1 moves the banners visually left to right in LTR; pass +1 for RTL.
     func runAutoScroll(step: Int) async {
-        guard !banners.isEmpty else { return }
-
         while !Task.isCancelled {
             try? await Task.sleep(for: .seconds(autoScrollInterval))
             if Task.isCancelled { break }
@@ -79,7 +98,8 @@ class BannerViewModel {
 
     private func advance(step: Int) {
 
-        guard !isTouching,
+        guard !banners.isEmpty,
+              !isTouching,
               Date().timeIntervalSince(lastInteraction) >= autoScrollInterval - 0.5 else { return }
 
         recentreIfNeeded()
@@ -94,7 +114,7 @@ class BannerViewModel {
     /// Waits until scrolling settles, then recentres if we drifted close to an end.
     private func scheduleRecentre() {
         recentreTask?.cancel()
-        recentreTask = Task { @MainActor [weak self] in
+        recentreTask = Task { [weak self] in
             try? await Task.sleep(for: .milliseconds(400))
             guard !Task.isCancelled, let self, !self.isTouching else { return }
             self.recentreIfNeeded()

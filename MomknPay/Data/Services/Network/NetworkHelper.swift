@@ -44,6 +44,9 @@ enum Endpoint {
     // Services
     case services
 
+    // Ads
+    case ads
+
     // Sessions
     case createSession
 
@@ -56,13 +59,14 @@ enum Endpoint {
     private var method: HTTPMethod {
         switch self {
         case .inquiry, .confirm, .createSession: return .post
-        case .services:                          return .get
+        case .services, .ads:                    return .get
         }
     }
 
     private var path: String {
         switch self {
         case .services:      return "services"
+        case .ads:           return "ads"
         case .createSession: return "sessions"
         case .inquiry:       return "payments/inquiry"
         case .confirm:       return "payments/confirm"
@@ -73,7 +77,7 @@ enum Endpoint {
         switch self {
         case .inquiry(let body, _):     return try JSONEncoder().encode(body)
         case .confirm(let body, _, _):  return try JSONEncoder().encode(body)
-        case .services, .createSession: return nil
+        case .services, .ads, .createSession: return nil
         }
     }
 
@@ -82,7 +86,7 @@ enum Endpoint {
         case .inquiry(_, let sessionId): return ["X-Session-Id": sessionId]
         case .confirm(_, let sessionId, let idempotencyKey):
             return ["X-Session-Id": sessionId, "Idempotency-Key": idempotencyKey]
-        case .services, .createSession:  return [:]
+        case .services, .ads, .createSession: return [:]
         }
     }
 

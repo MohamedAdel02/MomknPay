@@ -11,6 +11,7 @@ import Kingfisher
 struct BannerView: View {
  
     @State var viewModel: BannerViewModel
+    @Environment(\.openURL) private var openURL
    
     private let cardSpacing: CGFloat = 10
     private let cardHeight: CGFloat = 160
@@ -18,24 +19,14 @@ struct BannerView: View {
     private let sideMargin: CGFloat = 32
     private let sideScale: CGFloat = 0.8
  
-    init(viewModel: BannerViewModel = BannerViewModel()) {
-        _viewModel = State(initialValue: viewModel)
-        
-        
-    }
- 
     var body: some View {
-        if viewModel.isEmpty {
-            EmptyView()
-        } else {
-            VStack(spacing: 12) {
-                carousel
-                pageIndicator
-            }
-            .padding(.vertical, 8)
-            .environment(\.layoutDirection, .rightToLeft)
+        VStack(spacing: 12) {
+            carousel
+            pageIndicator
         }
-        
+        .padding(.vertical, 8)
+        .environment(\.layoutDirection, .rightToLeft)
+        .task { await viewModel.load() }
     }
   
     private var carousel: some View {
@@ -47,6 +38,9 @@ struct BannerView: View {
                     ForEach(0..<viewModel.total, id: \.self) { index in
                         BannerCardView(url: viewModel.banner(at: index).imageURL, cornerRadius: cornerRadius)
                             .frame(width: cardWidth, height: cardHeight)
+                            .onTapGesture {
+                                if let link = viewModel.banner(at: index).linkURL { openURL(link) }
+                            }
                             .scrollTransition(.interactive, axis: .horizontal) { content, phase in
                                 let distance = min(abs(phase.value), 1)
                                 return content.scaleEffect(x: 1, y: 1 - (1 - sideScale) * distance)
@@ -74,19 +68,6 @@ struct BannerView: View {
             await viewModel.runAutoScroll(step: 1)
         }
     }
- 
-    private func card(_ banner: Banner) -> some View {
-        Color.gray.opacity(0.15)
-            .overlay {
-                KFImage(banner.imageURL)
-                    .placeholder { ProgressView() }
-                    .fade(duration: 0.25)
-                    .cancelOnDisappear(true)
-                    .resizable()
-                    .scaledToFill()
-            }
-            .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-    }
 
     private var pageIndicator: some View {
         HStack(spacing: 8) {
@@ -101,6 +82,6 @@ struct BannerView: View {
 }
  
 #Preview {
-    BannerView()
+    BannerView(viewModel: BannerViewModel())
         .padding(.horizontal, 20)
 }
