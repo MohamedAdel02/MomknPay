@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		D918CC3530726C9800BEF016 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = D918CC3430726C9800BEF016 /* Kingfisher */; };
 		D98AB9863086349200D4E2F5 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = D98AB9853086349200D4E2F5 /* FirebaseCore */; };
+		D9A436E03088CCEF00430F75 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = D9A436DF3088CCEF00430F75 /* FirebaseMessaging */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +41,7 @@
 		D91668B13063F42B00E71295 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				D9A436E03088CCEF00430F75 /* FirebaseMessaging in Frameworks */,
 				D98AB9863086349200D4E2F5 /* FirebaseCore in Frameworks */,
 				D918CC3530726C9800BEF016 /* Kingfisher in Frameworks */,
 			);
@@ -91,6 +93,7 @@
 			packageProductDependencies = (
 				D918CC3430726C9800BEF016 /* Kingfisher */,
 				D98AB9853086349200D4E2F5 /* FirebaseCore */,
+				D9A436DF3088CCEF00430F75 /* FirebaseMessaging */,
 			);
 			productName = MomknPay;
 			productReference = D91668B43063F42B00E71295 /* MomknPay.app */;
@@ -394,6 +397,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = D923DF673086303400D8282A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCore;
+		};
+		D9A436DF3088CCEF00430F75 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D923DF673086303400D8282A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
