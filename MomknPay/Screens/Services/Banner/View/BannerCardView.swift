@@ -10,18 +10,24 @@ import Kingfisher
 
 struct BannerCardView: View {
 
-    let url: URL?
+    let banner: Banner
     let cornerRadius: CGFloat
 
     var body: some View {
         Color.gray.opacity(0.15)
             .overlay {
-                KFImage(url)
-                    .placeholder { ProgressView() }      
-                    .onFailureView { failureView }
-                    .fade(duration: 0.25)
-                    .resizable()
-                    .scaledToFill()
+                if let name = banner.localImageName {
+                    Image(name)
+                        .resizable()
+                        .scaledToFit()
+                } else {
+                    KFImage(banner.imageURL)
+                        .placeholder { ProgressView() }
+                        .onFailureView { failureView }
+                        .fade(duration: 0.25)
+                        .resizable()
+                        .scaledToFit()
+                }
             }
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
     }

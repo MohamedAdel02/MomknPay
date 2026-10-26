@@ -47,25 +47,37 @@ class BannerViewModel {
         banners[index % banners.count]
     }
 
+    // MARK: - Loading
 
     func load() async {
         guard !hasLoaded else { return }
 
         do {
             let items = try await repository.fetchBanners()
+            guard !items.isEmpty else {
+                useFallback()
+                return
+            }
             hasLoaded = true
-
-            guard !items.isEmpty else { return }
-            banners = items
-
-            let start = middle
-            currentID = start
-            lastIndex = start
+            apply(items)
         } catch {
             print("loading banners failed:", error)
+            useFallback()
         }
     }
 
+    private func useFallback() {
+        apply(Banner.mocks)
+    }
+
+    private func apply(_ items: [Banner]) {
+        banners = items
+        let start = middle
+        currentID = start
+        lastIndex = start
+    }
+
+    // MARK: - Interaction
 
     func positionChanged(_ newValue: Int?) {
         guard let newValue else { return }
